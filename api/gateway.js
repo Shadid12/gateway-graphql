@@ -48,22 +48,19 @@ async function makeGatewaySchema() {
 
 const app = express();
 
-
-async function main() {
+app.use(
+  '/graphql',
+  graphqlHTTP(async (req) => {
     const schema = await makeGatewaySchema();
-    app.use(
-        '/graphql',
-        graphqlHTTP((req) => ({
-          schema,
-          context: { authHeader: req.headers.authorization },
-          graphiql: true,
-        })),
-    );
-    serverless(app);
-    app.listen(3000);
-    console.log('Running a GraphQL API server at http://localhost:4000/graphql');
-}
+    return {
+      schema,
+      context: { authHeader: req.headers.authorization },
+      graphiql: true,
+    }
+  }),
+);
 
-main();
+serverless(app);
 
-module.exports = app;
+app.listen(4000);
+console.log('Running a GraphQL API server at http://localhost:4000/graphql');
