@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./api/gateway"
+    "start": "node gateway"
   },
   "keywords": [],
   "author": "",

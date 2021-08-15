@@ -1,0 +1,14 @@
+service: my-graphql
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  app:
+    handler: gateway.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'

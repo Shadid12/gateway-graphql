@@ -1,0 +1,6 @@
+type Inventory {
+    name: String
+    description: String
+    sku: Float
+    availableLocation: [String]
+}

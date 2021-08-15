@@ -1,0 +1,5 @@
+type Review {
+    email: String
+    comment: String
+    rating: Float
+}

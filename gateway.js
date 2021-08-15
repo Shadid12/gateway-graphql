@@ -7,6 +7,8 @@ const { stitchSchemas } = require('@graphql-tools/stitch');
 const { fetch } = require('cross-fetch');
 const { print } = require('graphql');
 const serverless = require('serverless-http');
+const bodyParser = require('body-parser')
+
 
 function makeRemoteExecutor(url, token) {
     return async ({ document, variables }) => {
@@ -22,18 +24,29 @@ function makeRemoteExecutor(url, token) {
 
 async function makeGatewaySchema() {
 
-    const userExecutor = await makeRemoteExecutor('https://graphql.fauna.com/graphql', 'fnAEQZPUejACQ2xuvfi50APAJ397hlGrTjhdXVta');
-    const productExecutor = await makeRemoteExecutor('https://graphql.fauna.com/graphql', 'fnAEQbI02HACQwTaUF9iOBbGC3fatQtclCOxZNfp');
-    
+    const reviewExecutor = await makeRemoteExecutor('https://graphql.fauna.com/graphql', 'fnAEQdRZVpACRMEEM1GKKYQxH2Qa4TzLKusTW2gN');
+    const productExecutor = await makeRemoteExecutor('https://graphql.fauna.com/graphql', 'fnAEQdSdXiACRGmgJgAEgmF_ZfO7iobiXGVP2NzT');
+    const inventoryExecutor = await makeRemoteExecutor('https://graphql.fauna.com/graphql', 'fnAEQdR0kYACRWKJJUUwWIYoZuD6cJDTvXI0_Y70');
+
+    const spacexExecutor = await makeRemoteExecutor('https://api.spacex.land/graphql/')
+
     return stitchSchemas({
         subschemas: [
           {
-            schema: await introspectSchema(productExecutor),
-            executor: productExecutor,
+            schema: await introspectSchema(reviewExecutor),
+            executor: reviewExecutor,
           },
           {
-            schema: await introspectSchema(userExecutor),
-            executor: userExecutor
+            schema: await introspectSchema(productExecutor),
+            executor: productExecutor
+          },
+          {
+            schema: await introspectSchema(inventoryExecutor),
+            executor: inventoryExecutor
+          },
+          {
+            schema: await introspectSchema(spacexExecutor),
+            executor: spacexExecutor
           }
         ],
         
@@ -48,6 +61,7 @@ async function makeGatewaySchema() {
 
 const app = express();
 
+app.use(bodyParser.json());
 app.use(
   '/graphql',
   graphqlHTTP(async (req) => {
@@ -60,7 +74,8 @@ app.use(
   }),
 );
 
-serverless(app);
-
 app.listen(4000);
 console.log('Running a GraphQL API server at http://localhost:4000/graphql');
+
+
+module.exports.handler = serverless(app);
